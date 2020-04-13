@@ -15,13 +15,14 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <title>Tarefas</title>
   <style type="text/css">
-    body, .modal-content{
+    body,
+    .modal-content {
       background: rgb(12, 92, 126);
     }
   </style>
 </head>
 
-<body style="color: #bdecb6"> 
+<body style="color: #bdecb6">
   <div class="container">
     <h1>Tarefas</h1>
     <br>
@@ -67,8 +68,8 @@
         <ul class="list-group" id="lista"></ul>
       </div>
     </div>
-    <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
+    <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -78,44 +79,46 @@
             </button>
           </div>
           <div class="modal-body">
-            <form id="form">
+            <form id="form-modal">
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <label for="nomeTarefa">Nome</label>
-                  <input type="text" class="form-control" id="nomeTarefa" size="25" placeholder="Informe o nome da tarefa"
-                    required>
+                  <label for="nomeTarefaModal">Nome</label>
+                  <input type="text" class="form-control" id="nomeTarefaModal" size="25"
+                    placeholder="Informe o nome da tarefa" required>
                 </div>
                 <div class="form-group col-md-2">
-                  <label for="nomeTarefa"></label>
+                  <label for="nomeTarefaModal"></label>
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="priority">Prioridade</label>
-                  <select id="priority" class="form-control">
+                  <label for="priorityModal">Prioridade</label>
+                  <select id="priorityModal" class="form-control">
                     <option selected>NORMAL</option>
                     <option>URGENTE</option>
                   </select>
                 </div>
               </div>
               <div class="form-group">
-                <label for="descricao">Descrição</label>
-                <input type="text" class="form-control" id="descricao" size="30"
+                <label for="descricaoModal">Descrição</label>
+                <input type="text" class="form-control" id="descricaoModal" size="30"
                   placeholder="Informe aqui a descrição da tarefa !" required>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <label for="inicio">Início</label>
-                  <input type="date" class="form-control" id="inicio" required>
+                  <label for="inicioModal">Início</label>
+                  <input type="date" class="form-control" id="inicioModal" required>
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="final">Final</label>
-                  <input type="date" class="form-control" id="final" required>
+                  <label for="finalModal">Final</label>
+                  <input type="date" class="form-control" id="finalModal" required>
                 </div>
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" style="background-color: #ff6961"class="btn delete btn-danger" data-dismiss="modal">FECHAR</button>
-            <button type="submit" style="background-color: #337ab7" class="btn btn-primary">SALVAR</button>
+            <button type="button" style="background-color: #ff6961" class="btn delete btn-danger"
+              data-dismiss="modal">FECHAR</button>
+            <button id="btnModal" data-dismiss="modal" type="button" onclick="atualiza(event)" style="background-color: #337ab7"
+              class="btn btn-primary">SALVAR</button>
           </div>
         </div>
       </div>
@@ -128,9 +131,45 @@
       renderData();
       const form = document.getElementById('form');
       const lista = document.querySelector('#lista');
+      const modal = document.getElementById('#exampleModal');
       form.addEventListener('submit', handleSubmit);
       lista.addEventListener('click', del);
+      lista.addEventListener('click', openModal);
       read();
+    }
+
+    async function atualiza(event) {
+      const nomeTarefa = document.getElementById('nomeTarefaModal').value;
+      const descricao = document.getElementById('descricaoModal').value;
+      const dtInicio = formatDate('inicioModal');
+      const dtFinal = formatDate('finalModal');
+      const prioridade = getSelectedValue('priorityModal');
+      const validaData = checarDatas(dtInicio, dtFinal);
+      const id = Number(event.currentTarget.attributes.data.value);
+
+      const dados = ({
+        name: nomeTarefa,
+        description: descricao,
+        start_date: dtInicio,
+        end_date: dtFinal,
+        priority: prioridade
+      });
+
+      if (validaData) {
+        try {
+          const response = await axios.put(`/update/${id}`, dados);
+          alert(`Registro ${id} atualizado com sucesso !`)
+          read();
+        } catch (erro) {
+
+        }
+      } else {
+        alert('A data inicial não pode ser maior que a data final !')
+      }
+    }
+
+    function edit(element) {
+      if (element.target.classList.contains('update')) {}
     }
 
     function renderData() {
@@ -151,7 +190,6 @@
       inicio.value = `${ano}-${mes}-${dia}`;
       fim.value = `${ano}-${mes}-${dia}`;
       console.log(dia + 1);
-      
     }
 
     function del(element) {
@@ -197,12 +235,12 @@
       } else {
         alert('A data inicial não pode ser maior que a data final !')
       }
-      
+
       limpaCampo();
       read();
     }
 
-    function limpaCampo () {
+    function limpaCampo() {
       document.querySelector('#nomeTarefa').value = '';
       document.querySelector('#descricao').value = '';
       renderData();
@@ -214,10 +252,43 @@
 								<i class="btn btn-danger delete fa fa-trash"
                 style="float: right; margin-left: 5px;" data-id ="${id}"></i>
                 
-                <i type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary update fa fa-edit"
+                <i type="button" class="btn btn-primary update fa fa-edit"
 								style="float: right;" data-id ="${id}"></i>
               </li>
               ${element ? `</li>` : ''}`
+    }
+
+    function openModal(element) {
+      if (element.target.classList.contains('update')) {
+        const id = element.target.dataset.id;
+        axios.get(`/task/${id}`).then((response) => {
+            if (response.status === 200) {
+              console.log(response.data);
+              const data = response.data;
+              document.getElementById('nomeTarefaModal').value = data.name;
+              document.getElementById('priorityModal').value = data.priority;
+              document.getElementById('descricaoModal').value = data.description;
+              document.getElementById('inicioModal').value = renderDataModal(data.start_date);
+              document.getElementById('finalModal').value = renderDataModal(data.end_date);
+              const botao = document.getElementById('btnModal');
+              var att = document.createAttribute('data');
+              att.value = `${id}`;
+              botao.setAttribute('data', `${id}`);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+        $("#exampleModal").modal();
+      }
+    }
+
+    function renderDataModal(date) {
+      const data = date.split('/');
+      let dia = data[0];
+      let mes = data[1];
+      let ano = data[2];
+      return `${ano}-${mes}-${dia}`;
     }
 
     function read() {
@@ -232,7 +303,7 @@
         .catch((error) => {
           console.log(error);
         })
-        limpaCampo();
+      limpaCampo();
     }
 
     function getSelectedValue(id) {
@@ -246,7 +317,6 @@
         year = datePart[0], // get only two digits
         month = datePart[1],
         day = datePart[2];
-
       return day + '/' + month + '/' + year;
     }
 
