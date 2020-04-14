@@ -13,11 +13,16 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <title>Tarefas</title>
   <style type="text/css">
     body,
     .modal-content {
       background: rgb(12, 92, 126);
+    }
+
+    .btnAlert {
+      background-color: #337ab7;
     }
   </style>
 </head>
@@ -158,13 +163,27 @@
       if (validaData) {
         try {
           const response = await axios.put(`/update/${id}`, dados);
-          alert(`Registro ${id} atualizado com sucesso !`);
+          await swal({
+            title: "Sucesso !",
+            text: "Registro alterado com sucesso !",
+            icon: "success",
+            button: {
+              className: "btnAlert",
+            }
+          });
           read();
         } catch (erro) {
-
+          await swal("Erro!", "Erro ao alterar o registro !", "error");
         }
       } else {
-        alert('A data inicial não pode ser maior que a data final !')
+        swal({
+          title: "Erro !",
+          text: "A data final não pode ser menor que a data inicial !",
+          icon: "error",
+          button: {
+            className: "btnAlert",
+          }
+        });
       }
     }
 
@@ -228,7 +247,14 @@
 
         }
       } else {
-        alert('A data inicial não pode ser maior que a data final !')
+        swal({
+          title: "Erro !",
+          text: "A data final não pode ser menor que a data inicial !",
+          icon: "error",
+          button: {
+            className: "btnAlert",
+          }
+        });
       }
 
       limpaCampo();
