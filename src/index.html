@@ -117,8 +117,8 @@
           <div class="modal-footer">
             <button type="button" style="background-color: #ff6961" class="btn delete btn-danger"
               data-dismiss="modal">FECHAR</button>
-            <button id="btnModal" data-dismiss="modal" type="button" onclick="atualiza(event)" style="background-color: #337ab7"
-              class="btn btn-primary">SALVAR</button>
+            <button id="btnModal" data-dismiss="modal" type="button" onclick="atualiza(event)"
+              style="background-color: #337ab7" class="btn btn-primary">SALVAR</button>
           </div>
         </div>
       </div>
@@ -158,7 +158,7 @@
       if (validaData) {
         try {
           const response = await axios.put(`/update/${id}`, dados);
-          alert(`Registro ${id} atualizado com sucesso !`)
+          alert(`Registro ${id} atualizado com sucesso !`);
           read();
         } catch (erro) {
 
@@ -166,10 +166,6 @@
       } else {
         alert('A data inicial não pode ser maior que a data final !')
       }
-    }
-
-    function edit(element) {
-      if (element.target.classList.contains('update')) {}
     }
 
     function renderData() {
@@ -180,7 +176,7 @@
       const inicio = document.querySelector('#inicio');
       const fim = document.querySelector('#final');
 
-      if (dia <= 9) {
+      if (dia < 10) {
         dia = "0" + dia;
       }
       if (mes < 10) {
@@ -189,7 +185,6 @@
 
       inicio.value = `${ano}-${mes}-${dia}`;
       fim.value = `${ano}-${mes}-${dia}`;
-      console.log(dia + 1);
     }
 
     function del(element) {
@@ -263,7 +258,6 @@
         const id = element.target.dataset.id;
         axios.get(`/task/${id}`).then((response) => {
             if (response.status === 200) {
-              console.log(response.data);
               const data = response.data;
               document.getElementById('nomeTarefaModal').value = data.name;
               document.getElementById('priorityModal').value = data.priority;
